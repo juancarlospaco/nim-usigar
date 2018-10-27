@@ -3,6 +3,10 @@
 [USIG Argentina](https://servicios.usig.buenosaires.gob.ar/normalizar) MultiSync API Lib for [Nim](https://nim-lang.org)
 *(All Docs on Spanish because its for Argentina)*
 
+Este Cliente es Async y Sync al mismo tiempo, es MultiPlataforma, MultiArquitectura,
+0 Dependencias, 1 Archivo solo, ~250 Kilobytes Compilado, muy poco uso de RAM.
+Soporta Proxy, IPv6, SSL y Timeout. Auto-Documentado.
+
 
 # Uso
 

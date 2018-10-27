@@ -51,6 +51,9 @@ proc normalizar*(this: USIGAr | AsyncUSIGAr, direccion="", maxOptions=10,
   result = await this.apicall(usigar_api_url & x & a & b & c & d & e & f)
 
 
+
+
+# De aca para abajo ya es codigo opcional, es solo para ejemplos, doc, etc.
 runnableExamples: # "nim doc usigar.nim" corre estos ejemplos y genera documentacion.
   import asyncdispatch, json
   ## Sync client.
@@ -78,3 +81,41 @@ runnableExamples: # "nim doc usigar.nim" corre estos ejemplos y genera documenta
     echo async_response.pretty
 
   wait_for async_usigar()
+
+
+when is_main_module and defined(release):
+  import parseopt, terminal, random
+  var
+    minusculas: bool  # API puede devolver un case raro,forzar todo lowercase.
+    maxOptions = 10
+    geocodificar = false
+    srid = 4326
+    lat = 0.0
+    lng = 0.0
+    tipoResultado = "calle_y_calle"
+  for tipoDeClave, clave, valor in getopt():
+    case tipoDeClave
+    of cmdShortOption, cmdLongOption:
+      case clave
+      of "version":             quit("0.1.5", 0)
+      of "license", "licencia": quit("MIT", 0)
+      of "help", "ayuda":       quit("""./usigar --color --minusculas --maxOptions=9 --geocodificar=true --srid=4326 --tipoResultado="calle_altura" "callao y corrientes, caba" """, 0)
+      of "maxOptions":          maxOptions = parseInt valor
+      of "geocodificar":        geocodificar = parseBool valor
+      of "srid":                srid = parseInt valor
+      of "lat":                 lat = parseFloat valor
+      of "lng":                 lng = parseFloat valor
+      of "tipoResultado":       tipoResultado = valor.strip.toLowerAscii
+      of "minusculas":          minusculas = true
+      of "color":
+        randomize()
+        setBackgroundColor(bgBlack)
+        setForegroundColor([fgRed, fgGreen, fgYellow, fgBlue, fgMagenta, fgCyan, fgWhite].rand)
+    of cmdArgument:
+      let
+        clientito = USIGAr(timeout: 99)
+        resultadito = clientito.normalizar(direccion=clave.strip.toLowerAscii,
+        maxOptions=maxOptions, geocodificar=geocodificar, srid=srid,
+        lat=lat, lng=lng, tipoResultado=tipoResultado).pretty
+      if minusculas: echo resultadito.toLowerAscii else: echo resultadito
+    of cmdEnd: quit("Los Parametros son incorrectos, ver Ayuda con --ayuda", 1)
